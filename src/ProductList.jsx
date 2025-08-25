@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
+import { addItem } from './CartSlice';
+import { useDispatch } from 'react-redux';
+
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState({});
+    const dispatch = useDispatch();
 
     const plantsArray = [
         {
@@ -252,6 +257,36 @@ function ProductList({ onHomeClick }) {
         e.preventDefault();
         setShowCart(false);
     };
+
+    const handleAddedToCart = (plant) => {
+        setAddedToCart((prev) => {
+            return { ...prev, [plant.name]: true }
+        })
+
+        dispatch(addItem(plant));
+    }
+
+    const renderPlants = () => {
+        return plantsArray.map((category, index) => (
+            <section style={{ textAlign: 'center' }} key={category.category + index}>
+                <h2 style={{ margin: '10px' }}>{category.category}</h2>
+                <div className="product-grid" style={{ margin: '30px' }}>
+                    {category.plants.map((plant, idx) => {
+                        return (
+                            <article className="product-card" key={plant.name + idx}>
+                                <img style={{ width: '250px', height: '250px' }} className='plant-image' src={plant.image} alt={plant.name + " Image - " + plant.description} />
+                                <h3 className='plant-name'>{plant.name}</h3>
+                                <p className='plant-description'>{plant.description}</p>
+                                <p className='plant-cost'>{plant.cost}</p>
+                                <button className='add-to-cart-button' onClick={() => handleAddedToCart(plant)} >Add to Cart</button>
+                            </article>
+                        )
+                    })}
+                </div>
+            </section>
+        ))
+    }
+
     return (
         <div>
             <div className="navbar" style={styleObj}>
@@ -265,7 +300,6 @@ function ProductList({ onHomeClick }) {
                             </div>
                         </a>
                     </div>
-
                 </div>
                 <div style={styleObjUl}>
                     <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
@@ -274,8 +308,7 @@ function ProductList({ onHomeClick }) {
             </div>
             {!showCart ? (
                 <div className="product-grid">
-
-
+                    {renderPlants()}
                 </div>
             ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
