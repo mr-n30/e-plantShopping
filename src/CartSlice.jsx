@@ -15,21 +15,19 @@ export const CartSlice = createSlice({
       state.items = itemsCopy;
     },
     updateQuantity: (state, action) => {
-      const newArr = state.items.map((obj, index) => {
+      state.items = state.items.map((obj) => {
         if (action.payload.name === obj.name) {
-          if (obj.quantity > 1) {
+          if (obj.quantity >= 1) {
             if (action.payload.increment) {
-              return { ...obj, quantity: obj.quantity + 1 }
+              return { ...action.payload, quantity: action.payload.quantity + 1 }
+            } else if (!action.payload.increment && action.payload.quantity > 1) {
+              return { ...action.payload, quantity: action.payload.quantity - 1 }
             }
-
-            return { ...obj, quantity: obj.quantity - 1 }
           }
         }
 
-        return { ...obj }
+        return { ...action.payload }
       })
-
-      state.items = newArr
     },
   },
 });
